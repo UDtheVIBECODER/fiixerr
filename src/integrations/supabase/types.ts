@@ -14,7 +14,260 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          appointment_at: string
+          brand_id: string | null
+          brand_name_snapshot: string
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          grand_total: number
+          id: string
+          labor_total: number
+          model_id: string | null
+          model_name_snapshot: string
+          notes: string | null
+          parts_total: number
+          post_repair_checklist: Json
+          pre_repair_checklist: Json
+          service_ids: string[]
+          service_mode: string
+          services_snapshot: Json
+          status: string
+          street_address: string | null
+          travel_fee: number
+          zip: string
+        }
+        Insert: {
+          appointment_at: string
+          brand_id?: string | null
+          brand_name_snapshot: string
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          grand_total?: number
+          id?: string
+          labor_total?: number
+          model_id?: string | null
+          model_name_snapshot: string
+          notes?: string | null
+          parts_total?: number
+          post_repair_checklist?: Json
+          pre_repair_checklist?: Json
+          service_ids?: string[]
+          service_mode: string
+          services_snapshot?: Json
+          status?: string
+          street_address?: string | null
+          travel_fee?: number
+          zip: string
+        }
+        Update: {
+          appointment_at?: string
+          brand_id?: string | null
+          brand_name_snapshot?: string
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          grand_total?: number
+          id?: string
+          labor_total?: number
+          model_id?: string | null
+          model_name_snapshot?: string
+          notes?: string | null
+          parts_total?: number
+          post_repair_checklist?: Json
+          pre_repair_checklist?: Json
+          service_ids?: string[]
+          service_mode?: string
+          services_snapshot?: Json
+          status?: string
+          street_address?: string | null
+          travel_fee?: number
+          zip?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brands: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      models: {
+        Row: {
+          brand_id: string
+          created_at: string
+          id: string
+          name: string
+          release_year: number | null
+          sort_order: number
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          id?: string
+          name: string
+          release_year?: number | null
+          sort_order?: number
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          release_year?: number | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "models_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pricing_matrix: {
+        Row: {
+          created_at: string
+          estimated_minutes: number
+          id: string
+          labor_fee: number
+          model_id: string
+          part_cost: number
+          service_id: string
+        }
+        Insert: {
+          created_at?: string
+          estimated_minutes?: number
+          id?: string
+          labor_fee?: number
+          model_id: string
+          part_cost?: number
+          service_id: string
+        }
+        Update: {
+          created_at?: string
+          estimated_minutes?: number
+          id?: string
+          labor_fee?: number
+          model_id?: string
+          part_cost?: number
+          service_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricing_matrix_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_matrix_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          created_at: string
+          default_labor_fee: number
+          description: string | null
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          default_labor_fee?: number
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          default_labor_fee?: number
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      zip_codes: {
+        Row: {
+          active: boolean
+          city: string | null
+          created_at: string
+          id: string
+          travel_fee: number
+          zip: string
+        }
+        Insert: {
+          active?: boolean
+          city?: string | null
+          created_at?: string
+          id?: string
+          travel_fee?: number
+          zip: string
+        }
+        Update: {
+          active?: boolean
+          city?: string | null
+          created_at?: string
+          id?: string
+          travel_fee?: number
+          zip?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
