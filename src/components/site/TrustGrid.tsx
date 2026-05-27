@@ -9,32 +9,32 @@ const items = [
   {
     icon: ListChecks,
     title: "60-second diagnostic",
-    body: "Free multi-point health check before a single tool comes out. You see the full report, you decide.",
+    body: "A free multi-point health check before any work begins. You see the full report and you decide what to do.",
   },
   {
     icon: Receipt,
     title: "Zero hidden fees",
-    body: "Parts + labor + travel is the entire bill. No 'inspection fees', no 'service charges', no surprises.",
+    body: "Parts plus labor plus travel is the entire bill. No inspection fees, no service charges, no surprises.",
   },
 ];
 
 export function TrustGrid() {
   return (
-    <section id="trust" aria-labelledby="trust-heading" className="mx-auto max-w-7xl px-4 sm:px-5 py-16 sm:py-24">
-      <div className="max-w-2xl mb-10 sm:mb-12">
-        <p className="text-cyan text-sm font-medium tracking-wide uppercase">Why Fiixerr</p>
-        <h2 id="trust-heading" className="mt-3 text-2xl sm:text-3xl md:text-5xl font-semibold tracking-tight">
-          Built to fix the repair industry, not just your phone.
+    <section id="trust" aria-labelledby="trust-heading" className="mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
+      <div className="max-w-2xl mb-10">
+        <p className="text-[var(--cyan)] text-sm font-semibold tracking-wide uppercase">Why Fiixerr</p>
+        <h2 id="trust-heading" className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+          A repair service you can trust.
         </h2>
       </div>
-      <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 list-none p-0">
+      <ul className="grid grid-cols-1 md:grid-cols-3 gap-5 list-none p-0">
         {items.map(({ icon: Icon, title, body }) => (
-          <li key={title} className="surface-card rounded-2xl p-6 sm:p-7 transition-all hover:-translate-y-1">
-            <div className="h-12 w-12 rounded-xl bg-[var(--cyan)]/10 grid place-items-center text-cyan border border-[var(--cyan)]/20" aria-hidden="true">
+          <li key={title} className="surface-card rounded-lg p-7">
+            <div className="h-12 w-12 rounded-md bg-[var(--cyan)] grid place-items-center text-[var(--primary-foreground)]" aria-hidden="true">
               <Icon className="h-6 w-6" />
             </div>
-            <h3 className="mt-5 sm:mt-6 text-lg sm:text-xl font-semibold tracking-tight">{title}</h3>
-            <p className="mt-2 sm:mt-3 text-muted-foreground leading-relaxed">{body}</p>
+            <h3 className="mt-5 text-xl font-bold text-foreground">{title}</h3>
+            <p className="mt-3 text-foreground/75 leading-relaxed">{body}</p>
           </li>
         ))}
       </ul>
