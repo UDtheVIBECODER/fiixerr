@@ -214,19 +214,23 @@ export function BookingEngine() {
   }
 
   return (
-    <section id="book" className="mx-auto max-w-7xl px-5 py-20">
-      <div className="max-w-2xl mb-10">
+    <section id="book" aria-labelledby="book-heading" className="mx-auto max-w-7xl px-4 sm:px-5 py-16 sm:py-20">
+      <div className="max-w-2xl mb-8 sm:mb-10">
         <p id="pricing" className="text-cyan text-sm font-medium tracking-wide uppercase">Upfront pricing</p>
-        <h2 className="mt-3 text-3xl md:text-5xl font-semibold tracking-tight">
+        <h2 id="book-heading" className="mt-3 text-2xl sm:text-3xl md:text-5xl font-semibold tracking-tight">
           Build your repair. See the total before we touch your device.
         </h2>
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_360px] gap-6">
-        <div className="surface-card rounded-2xl p-6 md:p-8">
+      <div className="grid lg:grid-cols-[1fr_360px] gap-5 sm:gap-6">
+        <div
+          className="surface-card rounded-2xl p-4 sm:p-6 md:p-8"
+          role="region"
+          aria-label={`Booking step ${step + 1} of ${STEPS.length}: ${STEPS[step]}`}
+        >
           <StepBar step={step} />
 
-          <div className="mt-8 min-h-[360px]">
+          <div className="mt-6 sm:mt-8 min-h-[360px]" aria-live="polite">
             {step === 0 && <BrandStep brands={brands} value={brandId} onChange={(id) => { setBrandId(id); setModelId(null); setServiceIds([]); }} />}
             {step === 1 && (
               <ModelStep
@@ -260,25 +264,27 @@ export function BookingEngine() {
             )}
           </div>
 
-          <div className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-6">
+          <div className="mt-6 sm:mt-8 flex items-center justify-between gap-3 border-t border-border pt-5 sm:pt-6">
             <Button
               variant="outline" size="touch"
               onClick={() => setStep((s) => Math.max(0, s - 1))}
               disabled={step === 0}
+              aria-label="Go to previous step"
             >
-              <ArrowLeft className="h-4 w-4" /> Back
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back
             </Button>
             {step < STEPS.length - 1 ? (
               <Button
                 variant="cyan" size="touch"
                 onClick={() => setStep((s) => s + 1)}
                 disabled={!canNext()}
+                aria-label={`Continue to ${STEPS[step + 1]}`}
               >
-                Continue <ArrowRight className="h-4 w-4" />
+                Continue <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             ) : (
-              <Button variant="hero" size="touch" onClick={submit} disabled={submitting}>
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              <Button variant="hero" size="touch" onClick={submit} disabled={submitting} aria-label="Confirm booking">
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Check className="h-4 w-4" aria-hidden="true" />}
                 Confirm booking
               </Button>
             )}
