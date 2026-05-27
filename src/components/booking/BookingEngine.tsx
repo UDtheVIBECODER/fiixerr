@@ -702,7 +702,7 @@ function BookingSuccess({ id, total, slot, mode }: { id: string; total: number; 
         <div className="mx-auto h-16 w-16 rounded-full bg-[var(--cyan)]/15 border border-[var(--cyan)]/40 grid place-items-center text-cyan">
           <CheckCircle2 className="h-8 w-8" />
         </div>
-        <h2 className="mt-6 text-3xl font-semibold tracking-tight">You're booked.</h2>
+        <h2 className="mt-6 text-2xl sm:text-3xl font-semibold tracking-tight">You're booked with Fiixerr.</h2>
         <p className="mt-3 text-muted-foreground">
           Confirmation #{id.slice(0, 8).toUpperCase()} — we just emailed you the details and the lifetime warranty terms.
         </p>
