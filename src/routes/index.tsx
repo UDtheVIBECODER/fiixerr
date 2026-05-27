@@ -10,13 +10,13 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "FixHub — Honest Mobile Phone Repair at Home or Work" },
+      { title: "Fiixerr — Honest Mobile Phone Repair at Home or Work" },
       {
         name: "description",
         content:
-          "Upfront repair pricing for iPhone, Samsung, and Pixel. We come to your driveway in under 30 minutes. Lifetime parts warranty. Zero hidden fees.",
+          "Fiixerr offers upfront repair pricing for iPhone, Samsung, and Pixel. We come to your driveway in under 30 minutes. Lifetime parts warranty. Zero hidden fees.",
       },
-      { property: "og:title", content: "FixHub — Anti-Extortion Mobile Phone Repair" },
+      { property: "og:title", content: "Fiixerr — Anti-Extortion Mobile Phone Repair" },
       {
         property: "og:description",
         content:
@@ -28,13 +28,18 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <main>
+    <>
+      <a href="#book" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-[var(--cyan)] focus:text-[var(--primary-foreground)] focus:px-4 focus:py-2 focus:rounded-md">
+        Skip to booking
+      </a>
       <SiteHeader />
-      <Hero />
-      <BookingEngine />
-      <TrustGrid />
+      <main id="main">
+        <Hero />
+        <BookingEngine />
+        <TrustGrid />
+      </main>
       <SiteFooter />
       <Toaster theme="dark" />
-    </main>
+    </>
   );
 }
