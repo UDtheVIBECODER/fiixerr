@@ -39,7 +39,7 @@ function Index() {
         <TrustGrid />
       </main>
       <SiteFooter />
-      <Toaster theme="dark" />
+      <Toaster theme="light" />
     </>
   );
 }

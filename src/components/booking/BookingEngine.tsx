@@ -216,10 +216,11 @@ export function BookingEngine() {
   return (
     <section id="book" aria-labelledby="book-heading" className="mx-auto max-w-7xl px-4 sm:px-5 py-16 sm:py-20">
       <div className="max-w-2xl mb-8 sm:mb-10">
-        <p id="pricing" className="text-cyan text-sm font-medium tracking-wide uppercase">Upfront pricing</p>
-        <h2 id="book-heading" className="mt-3 text-2xl sm:text-3xl md:text-5xl font-semibold tracking-tight">
-          Build your repair. See the total before we touch your device.
+        <p id="pricing" className="text-[var(--cyan)] text-sm font-semibold tracking-wide uppercase">Upfront pricing</p>
+        <h2 id="book-heading" className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+          Book your repair in 6 simple steps.
         </h2>
+        <p className="mt-3 text-lg text-foreground/75">See your exact total before we touch your device — no surprises.</p>
       </div>
 
       <div className="grid lg:grid-cols-[1fr_360px] gap-5 sm:gap-6">
@@ -340,8 +341,8 @@ function StepBar({ step }: { step: number }) {
 function BrandStep({ brands, value, onChange }: { brands: Brand[]; value: string | null; onChange: (id: string) => void }) {
   return (
     <div>
-      <h3 className="text-xl font-semibold tracking-tight">Pick your brand</h3>
-      <p className="text-muted-foreground mt-1">We service all current and recent flagship lineups.</p>
+      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 1: Choose your phone brand</h3>
+      <p className="text-foreground/75 mt-2 text-base">We service all current and recent flagship lineups.</p>
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
         {brands.map((b) => {
           const active = value === b.id;
@@ -382,8 +383,8 @@ function ModelStep({
 }) {
   return (
     <div>
-      <h3 className="text-xl font-semibold tracking-tight">Choose your model</h3>
-      <p className="text-muted-foreground mt-1">Don't see yours? Search above.</p>
+      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 2: Choose your phone model</h3>
+      <p className="text-foreground/75 mt-2 text-base">Type your model name to find it quickly.</p>
       <div className="mt-4 relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -430,8 +431,8 @@ function ServicesStep({
 }) {
   return (
     <div>
-      <h3 className="text-xl font-semibold tracking-tight">What needs fixing?</h3>
-      <p className="text-muted-foreground mt-1">Select one or more. Prices include OEM-grade parts and labor.</p>
+      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 3: Choose your repairs</h3>
+      <p className="text-foreground/75 mt-2 text-base">Select one or more. Prices include genuine parts and labor.</p>
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
         {services.map((s) => {
           const p = pricing.get(s.id);
@@ -479,8 +480,8 @@ function LogisticsStep({
   const invalid = zip.length === 5 && zipRow === null;
   return (
     <div>
-      <h3 className="text-xl font-semibold tracking-tight">Where should we meet?</h3>
-      <p className="text-muted-foreground mt-1">We'll verify coverage and quote travel upfront — no surprises.</p>
+      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 4: Where should we meet?</h3>
+      <p className="text-foreground/75 mt-2 text-base">Enter your zip code. We'll confirm coverage and quote travel upfront.</p>
 
       <div className="mt-6">
         <Label htmlFor="zip" className="text-sm">Zip code</Label>
@@ -550,8 +551,8 @@ function ScheduleStep({
   const [selectedDay, setSelectedDay] = useState(0);
   return (
     <div>
-      <h3 className="text-xl font-semibold tracking-tight">Pick a time</h3>
-      <p className="text-muted-foreground mt-1">Same-week availability. Reschedule free up to 2 hours before.</p>
+      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 5: Pick a date and time</h3>
+      <p className="text-foreground/75 mt-2 text-base">Same-week availability. Reschedule for free up to 2 hours before.</p>
 
       <div className="mt-6 flex gap-2 overflow-x-auto pb-2">
         {days.map((d, i) => (
@@ -603,8 +604,8 @@ function IntakeStep({
 }) {
   return (
     <div>
-      <h3 className="text-xl font-semibold tracking-tight">Your details</h3>
-      <p className="text-muted-foreground mt-1">We text you a 60-second reminder before the technician arrives.</p>
+      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 6: Your contact details</h3>
+      <p className="text-foreground/75 mt-2 text-base">We'll text a reminder before the technician arrives.</p>
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Full name">
           <Input value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} className="h-12 bg-[var(--surface)]" />
@@ -674,11 +675,11 @@ function PriceSummary({
         />
       </div>
 
-      <div className="mt-5 rounded-xl bg-[var(--cyan)]/10 border border-[var(--cyan)]/30 p-4 flex items-baseline justify-between">
-        <div className="text-sm font-medium">Total</div>
-        <div className="text-3xl font-semibold text-cyan tracking-tight">{fmt(grandTotal)}</div>
+      <div className="mt-5 rounded-lg bg-[var(--cyan)] text-[var(--primary-foreground)] p-5">
+        <div className="text-sm font-semibold uppercase tracking-wide opacity-90">Total Repair Cost</div>
+        <div className="text-4xl font-bold tracking-tight mt-1">{fmt(grandTotal)}</div>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
+      <p className="mt-3 text-sm text-foreground/70 leading-relaxed">
         Parts + Labor + Travel = Total. No diagnostic fees. No upcharges on-site.
       </p>
     </aside>
