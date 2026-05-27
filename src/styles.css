@@ -85,13 +85,23 @@
 @layer base {
   * {
     border-color: var(--color-border);
+    /* Prevent horizontal overflow & word clipping on narrow screens */
+    min-width: 0;
+  }
+  html {
+    /* Fluid base font-size: 14px @ 320px → 16px @ 480px+ */
+    font-size: clamp(0.875rem, 0.7rem + 0.55vw, 1rem);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
+  img, svg, video { max-width: 100%; height: auto; }
   /* Force dark feel even without .dark class */
   body {
     background:
@@ -102,9 +112,23 @@
   h1, h2, h3 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
+    word-break: break-word;
   }
   ::selection { background: var(--cyan); color: var(--background); }
+
+  /* Ensure all interactive controls meet 44px tap target */
+  button, a[role="button"], [type="button"], [type="submit"] {
+    touch-action: manipulation;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
+
 
 @layer utilities {
   .cyan-glow {

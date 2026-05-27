@@ -71,19 +71,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Repair Right Now is a mobile phone repair booking app offering transparent pricing and at-home service." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Repair Right Now is a mobile phone repair booking app offering transparent pricing and at-home service." },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#0b0d12" },
+      { title: "Fiixerr — Honest Mobile Phone Repair" },
+      { name: "description", content: "Fiixerr brings transparent, anti-extortion phone repair to your home or work. Upfront prices, lifetime warranty." },
+      { property: "og:title", content: "Fiixerr — Honest Mobile Phone Repair" },
+      { property: "og:description", content: "Upfront pricing. Lifetime warranty. We come to you." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "Repair Right Now is a mobile phone repair booking app offering transparent pricing and at-home service." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9e282d6e-05f2-44b0-80d9-1aeb9d0c11ab/id-preview-2bb33bba--1a721996-0e73-4294-984c-4ae8a50c3349.lovable.app-1779754363861.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9e282d6e-05f2-44b0-80d9-1aeb9d0c11ab/id-preview-2bb33bba--1a721996-0e73-4294-984c-4ae8a50c3349.lovable.app-1779754363861.png" },
+      { name: "twitter:title", content: "Fiixerr — Honest Mobile Phone Repair" },
+      { name: "twitter:description", content: "Upfront pricing. Lifetime warranty. We come to you." },
     ],
     links: [
       {
