@@ -347,8 +347,11 @@ function BrandStep({ brands, value, onChange }: { brands: Brand[]; value: string
           const active = value === b.id;
           return (
             <button
+              type="button"
               key={b.id}
               onClick={() => onChange(b.id)}
+              aria-pressed={active}
+              aria-label={`Select brand ${b.name}`}
               className={cn(
                 "min-h-[120px] rounded-xl p-5 text-left transition-all border",
                 active
@@ -359,7 +362,7 @@ function BrandStep({ brands, value, onChange }: { brands: Brand[]; value: string
               <div className={cn(
                 "h-10 w-10 rounded-lg grid place-items-center border",
                 active ? "border-[var(--cyan)]/40 text-cyan" : "border-border text-muted-foreground"
-              )}>
+              )} aria-hidden="true">
                 <Smartphone className="h-5 w-5" />
               </div>
               <div className="mt-4 text-lg font-semibold">{b.name}</div>
