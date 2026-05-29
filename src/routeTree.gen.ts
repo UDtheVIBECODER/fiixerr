@@ -15,6 +15,10 @@ import { Route as AccessRouteImport } from './routes/access'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard.dashboard'
+import { Route as DashboardDashboardTeamRouteImport } from './routes/_dashboard.dashboard.team'
+import { Route as DashboardDashboardOrdersRouteImport } from './routes/_dashboard.dashboard.orders'
+import { Route as DashboardDashboardCodesRouteImport } from './routes/_dashboard.dashboard.codes'
+import { Route as DashboardDashboardCatalogRouteImport } from './routes/_dashboard.dashboard.catalog'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -45,20 +49,50 @@ const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardDashboardTeamRoute = DashboardDashboardTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
+const DashboardDashboardOrdersRoute =
+  DashboardDashboardOrdersRouteImport.update({
+    id: '/orders',
+    path: '/orders',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
+const DashboardDashboardCodesRoute = DashboardDashboardCodesRouteImport.update({
+  id: '/codes',
+  path: '/codes',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
+const DashboardDashboardCatalogRoute =
+  DashboardDashboardCatalogRouteImport.update({
+    id: '/catalog',
+    path: '/catalog',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access': typeof AccessRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/dashboard': typeof DashboardDashboardRoute
+  '/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
+  '/dashboard/codes': typeof DashboardDashboardCodesRoute
+  '/dashboard/orders': typeof DashboardDashboardOrdersRoute
+  '/dashboard/team': typeof DashboardDashboardTeamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/access': typeof AccessRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/dashboard': typeof DashboardDashboardRoute
+  '/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
+  '/dashboard/codes': typeof DashboardDashboardCodesRoute
+  '/dashboard/orders': typeof DashboardDashboardOrdersRoute
+  '/dashboard/team': typeof DashboardDashboardTeamRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -67,13 +101,35 @@ export interface FileRoutesById {
   '/access': typeof AccessRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/_dashboard/dashboard': typeof DashboardDashboardRoute
+  '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/_dashboard/dashboard/catalog': typeof DashboardDashboardCatalogRoute
+  '/_dashboard/dashboard/codes': typeof DashboardDashboardCodesRoute
+  '/_dashboard/dashboard/orders': typeof DashboardDashboardOrdersRoute
+  '/_dashboard/dashboard/team': typeof DashboardDashboardTeamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/access' | '/login' | '/register' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/access'
+    | '/login'
+    | '/register'
+    | '/dashboard'
+    | '/dashboard/catalog'
+    | '/dashboard/codes'
+    | '/dashboard/orders'
+    | '/dashboard/team'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/access' | '/login' | '/register' | '/dashboard'
+  to:
+    | '/'
+    | '/access'
+    | '/login'
+    | '/register'
+    | '/dashboard'
+    | '/dashboard/catalog'
+    | '/dashboard/codes'
+    | '/dashboard/orders'
+    | '/dashboard/team'
   id:
     | '__root__'
     | '/'
@@ -82,6 +138,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/_dashboard/dashboard'
+    | '/_dashboard/dashboard/catalog'
+    | '/_dashboard/dashboard/codes'
+    | '/_dashboard/dashboard/orders'
+    | '/_dashboard/dashboard/team'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -136,15 +196,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/dashboard/team': {
+      id: '/_dashboard/dashboard/team'
+      path: '/team'
+      fullPath: '/dashboard/team'
+      preLoaderRoute: typeof DashboardDashboardTeamRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
+    '/_dashboard/dashboard/orders': {
+      id: '/_dashboard/dashboard/orders'
+      path: '/orders'
+      fullPath: '/dashboard/orders'
+      preLoaderRoute: typeof DashboardDashboardOrdersRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
+    '/_dashboard/dashboard/codes': {
+      id: '/_dashboard/dashboard/codes'
+      path: '/codes'
+      fullPath: '/dashboard/codes'
+      preLoaderRoute: typeof DashboardDashboardCodesRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
+    '/_dashboard/dashboard/catalog': {
+      id: '/_dashboard/dashboard/catalog'
+      path: '/catalog'
+      fullPath: '/dashboard/catalog'
+      preLoaderRoute: typeof DashboardDashboardCatalogRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
   }
 }
 
+interface DashboardDashboardRouteChildren {
+  DashboardDashboardCatalogRoute: typeof DashboardDashboardCatalogRoute
+  DashboardDashboardCodesRoute: typeof DashboardDashboardCodesRoute
+  DashboardDashboardOrdersRoute: typeof DashboardDashboardOrdersRoute
+  DashboardDashboardTeamRoute: typeof DashboardDashboardTeamRoute
+}
+
+const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
+  DashboardDashboardCatalogRoute: DashboardDashboardCatalogRoute,
+  DashboardDashboardCodesRoute: DashboardDashboardCodesRoute,
+  DashboardDashboardOrdersRoute: DashboardDashboardOrdersRoute,
+  DashboardDashboardTeamRoute: DashboardDashboardTeamRoute,
+}
+
+const DashboardDashboardRouteWithChildren =
+  DashboardDashboardRoute._addFileChildren(DashboardDashboardRouteChildren)
+
 interface DashboardRouteChildren {
-  DashboardDashboardRoute: typeof DashboardDashboardRoute
+  DashboardDashboardRoute: typeof DashboardDashboardRouteWithChildren
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardDashboardRoute: DashboardDashboardRoute,
+  DashboardDashboardRoute: DashboardDashboardRouteWithChildren,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
