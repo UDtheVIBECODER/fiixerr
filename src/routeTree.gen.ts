@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AccessRouteImport } from './routes/access'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard.dashboard'
+import { Route as DashboardDashboardUltimateAdminRouteImport } from './routes/_dashboard.dashboard.ultimate-admin'
 import { Route as DashboardDashboardTeamRouteImport } from './routes/_dashboard.dashboard.team'
 import { Route as DashboardDashboardOrdersRouteImport } from './routes/_dashboard.dashboard.orders'
 import { Route as DashboardDashboardCodesRouteImport } from './routes/_dashboard.dashboard.codes'
@@ -28,6 +30,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccessRoute = AccessRouteImport.update({
@@ -49,6 +56,12 @@ const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardDashboardUltimateAdminRoute =
+  DashboardDashboardUltimateAdminRouteImport.update({
+    id: '/ultimate-admin',
+    path: '/ultimate-admin',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 const DashboardDashboardTeamRoute = DashboardDashboardTeamRouteImport.update({
   id: '/team',
   path: '/team',
@@ -75,6 +88,7 @@ const DashboardDashboardCatalogRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access': typeof AccessRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
@@ -82,10 +96,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
   '/dashboard/team': typeof DashboardDashboardTeamRoute
+  '/dashboard/ultimate-admin': typeof DashboardDashboardUltimateAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/access': typeof AccessRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
@@ -93,12 +109,14 @@ export interface FileRoutesByTo {
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
   '/dashboard/team': typeof DashboardDashboardTeamRoute
+  '/dashboard/ultimate-admin': typeof DashboardDashboardUltimateAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_dashboard': typeof DashboardRouteWithChildren
   '/access': typeof AccessRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
@@ -106,12 +124,14 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/_dashboard/dashboard/orders': typeof DashboardDashboardOrdersRoute
   '/_dashboard/dashboard/team': typeof DashboardDashboardTeamRoute
+  '/_dashboard/dashboard/ultimate-admin': typeof DashboardDashboardUltimateAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/access'
+    | '/checkout'
     | '/login'
     | '/register'
     | '/dashboard'
@@ -119,10 +139,12 @@ export interface FileRouteTypes {
     | '/dashboard/codes'
     | '/dashboard/orders'
     | '/dashboard/team'
+    | '/dashboard/ultimate-admin'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/access'
+    | '/checkout'
     | '/login'
     | '/register'
     | '/dashboard'
@@ -130,11 +152,13 @@ export interface FileRouteTypes {
     | '/dashboard/codes'
     | '/dashboard/orders'
     | '/dashboard/team'
+    | '/dashboard/ultimate-admin'
   id:
     | '__root__'
     | '/'
     | '/_dashboard'
     | '/access'
+    | '/checkout'
     | '/login'
     | '/register'
     | '/_dashboard/dashboard'
@@ -142,12 +166,14 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/codes'
     | '/_dashboard/dashboard/orders'
     | '/_dashboard/dashboard/team'
+    | '/_dashboard/dashboard/ultimate-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   AccessRoute: typeof AccessRoute
+  CheckoutRoute: typeof CheckoutRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
 }
@@ -166,6 +192,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/access': {
@@ -195,6 +228,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardDashboardRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/ultimate-admin': {
+      id: '/_dashboard/dashboard/ultimate-admin'
+      path: '/ultimate-admin'
+      fullPath: '/dashboard/ultimate-admin'
+      preLoaderRoute: typeof DashboardDashboardUltimateAdminRouteImport
+      parentRoute: typeof DashboardDashboardRoute
     }
     '/_dashboard/dashboard/team': {
       id: '/_dashboard/dashboard/team'
@@ -232,6 +272,7 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardCodesRoute: typeof DashboardDashboardCodesRoute
   DashboardDashboardOrdersRoute: typeof DashboardDashboardOrdersRoute
   DashboardDashboardTeamRoute: typeof DashboardDashboardTeamRoute
+  DashboardDashboardUltimateAdminRoute: typeof DashboardDashboardUltimateAdminRoute
 }
 
 const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
@@ -239,6 +280,7 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardCodesRoute: DashboardDashboardCodesRoute,
   DashboardDashboardOrdersRoute: DashboardDashboardOrdersRoute,
   DashboardDashboardTeamRoute: DashboardDashboardTeamRoute,
+  DashboardDashboardUltimateAdminRoute: DashboardDashboardUltimateAdminRoute,
 }
 
 const DashboardDashboardRouteWithChildren =
@@ -260,9 +302,20 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
   AccessRoute: AccessRoute,
+  CheckoutRoute: CheckoutRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
