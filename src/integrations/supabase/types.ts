@@ -289,36 +289,6 @@ export type Database = {
         }
         Relationships: []
       }
-      system_settings: {
-        Row: {
-          id: string
-          key: string
-          value: string
-          description: string | null
-          updated_by: string | null
-          updated_at: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          key: string
-          value?: string
-          description?: string | null
-          updated_by?: string | null
-          updated_at?: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          key?: string
-          value?: string
-          description?: string | null
-          updated_by?: string | null
-          updated_at?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
       zip_codes: {
         Row: {
           active: boolean
