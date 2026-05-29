@@ -5,13 +5,34 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyProfile } from "@/hooks/useMyProfile";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
-import { LogOut, Wrench, ClipboardList, Settings, KeyRound, Users } from "lucide-react";
+import { LogOut, Wrench, ClipboardList, Settings, KeyRound, Users, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_dashboard")({
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
       throw redirect({ to: "/access" });
+    }
+
+    // After Google OAuth the redirect lands on /dashboard.
+    // If this user is ULTIMATE_ADMIN, send them straight to the admin panel
+    // instead of letting the generic /dashboard/orders redirect fire, which
+    // would loop back through beforeLoad again.
+    const currentPath = location.pathname;
+    if (currentPath === "/dashboard") {
+      const { data: profile, error: profileErr } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      if (profileErr) {
+        console.error("[Auth] Failed to query profile for role check:", profileErr.message);
+      }
+
+      if (profile?.role === "ULTIMATE_ADMIN") {
+        throw redirect({ to: "/dashboard/ultimate-admin" });
+      }
     }
   },
   component: DashboardLayout,
@@ -24,9 +45,34 @@ function DashboardLayout() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange(() => {
-      router.invalidate();
-      queryClient.invalidateQueries();
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      // Handle Google OAuth callback: once signed in, invalidate and let
+      // beforeLoad handle the role-based redirect cleanly.
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        (async () => {
+          if (!session?.user) return;
+          const { data: profile, error } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (error) {
+            console.error("[Auth] onAuthStateChange profile lookup failed:", error.message);
+            return;
+          }
+
+          if (profile?.role === "ULTIMATE_ADMIN") {
+            await router.navigate({ to: "/dashboard/ultimate-admin" });
+          } else {
+            router.invalidate();
+            queryClient.invalidateQueries();
+          }
+        })();
+      } else {
+        router.invalidate();
+        queryClient.invalidateQueries();
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
@@ -47,9 +93,12 @@ function DashboardLayout() {
         <div className="max-w-md text-center space-y-4">
           <h1 className="text-xl font-semibold">No profile found</h1>
           <p className="text-muted-foreground text-sm">
-            Your account is signed in but isn't linked to a Fiixerr profile. Ask the owner to invite you, or sign out and use a registration code.
+            Your account is signed in but isn't linked to a Fiixerr profile. Ask the owner to invite
+            you, or sign out and use a registration code.
           </p>
-          <Button onClick={signOut} variant="outline" size="touch">Sign out</Button>
+          <Button onClick={signOut} variant="outline" size="touch">
+            Sign out
+          </Button>
         </div>
       </div>
     );
@@ -67,15 +116,34 @@ function DashboardLayout() {
           <span className="font-semibold text-foreground">Fiixerr</span>
         </Link>
         <nav className="space-y-1">
-          <NavItem to="/dashboard/orders" icon={<ClipboardList className="h-4 w-4" />}>Orders</NavItem>
-          {isAdminOrUp && <NavItem to="/dashboard/catalog" icon={<Settings className="h-4 w-4" />}>Catalog & Pricing</NavItem>}
-          {isUltimate && <NavItem to="/dashboard/codes" icon={<KeyRound className="h-4 w-4" />}>Registration Codes</NavItem>}
-          {isUltimate && <NavItem to="/dashboard/team" icon={<Users className="h-4 w-4" />}>Team</NavItem>}
+          <NavItem to="/dashboard/orders" icon={<ClipboardList className="h-4 w-4" />}>
+            Orders
+          </NavItem>
+          {isAdminOrUp && (
+            <NavItem to="/dashboard/catalog" icon={<Settings className="h-4 w-4" />}>
+              Catalog & Pricing
+            </NavItem>
+          )}
+          {isUltimate && (
+            <NavItem to="/dashboard/codes" icon={<KeyRound className="h-4 w-4" />}>
+              Registration Codes
+            </NavItem>
+          )}
+          {isUltimate && (
+            <NavItem to="/dashboard/team" icon={<Users className="h-4 w-4" />}>
+              Team
+            </NavItem>
+          )}
+          {isUltimate && (
+            <NavItem to="/dashboard/ultimate-admin" icon={<ShieldCheck className="h-4 w-4" />}>
+              Admin Panel
+            </NavItem>
+          )}
         </nav>
         <div className="mt-8 pt-4 border-t border-border space-y-2">
           <div className="text-sm">
             <div className="font-medium text-foreground">{profile.username}</div>
-            <div className="text-xs text-muted-foreground">{role.replace("_", " ")}</div>
+            <div className="text-xs text-muted-foreground">{role.replace(/_/g, " ")}</div>
           </div>
           <Button onClick={signOut} variant="outline" size="sm" className="w-full">
             <LogOut className="h-4 w-4" /> Sign out
@@ -90,12 +158,23 @@ function DashboardLayout() {
   );
 }
 
-function NavItem({ to, icon, children }: { to: string; icon: React.ReactNode; children: React.ReactNode }) {
+function NavItem({
+  to,
+  icon,
+  children,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <Link
       to={to}
       className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-foreground hover:bg-secondary transition-colors min-h-[44px]"
-      activeProps={{ className: "flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-secondary text-foreground font-medium min-h-[44px]" }}
+      activeProps={{
+        className:
+          "flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-secondary text-foreground font-medium min-h-[44px]",
+      }}
     >
       {icon}
       {children}
