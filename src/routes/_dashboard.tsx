@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyProfile } from "@/hooks/useMyProfile";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
-import { LogOut, Wrench, ClipboardList, Settings, KeyRound, Users } from "lucide-react";
+import { LogOut, Wrench, ClipboardList, Settings, KeyRound, Users, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/_dashboard")({
   beforeLoad: async () => {
