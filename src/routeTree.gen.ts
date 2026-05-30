@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AccessRouteImport } from './routes/access'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard.dashboard'
 import { Route as DashboardDashboardTeamRouteImport } from './routes/_dashboard.dashboard.team'
 import { Route as DashboardDashboardOrdersRouteImport } from './routes/_dashboard.dashboard.orders'
@@ -42,6 +43,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/auth/callback': typeof AuthCallbackRoute
   '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/auth/callback': typeof AuthCallbackRoute
   '/_dashboard/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/_dashboard/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/_dashboard/dashboard/orders': typeof DashboardDashboardOrdersRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/auth/callback'
     | '/dashboard/catalog'
     | '/dashboard/codes'
     | '/dashboard/orders'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/auth/callback'
     | '/dashboard/catalog'
     | '/dashboard/codes'
     | '/dashboard/orders'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/_dashboard/dashboard'
+    | '/auth/callback'
     | '/_dashboard/dashboard/catalog'
     | '/_dashboard/dashboard/codes'
     | '/_dashboard/dashboard/orders'
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   AccessRoute: typeof AccessRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -187,6 +200,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_dashboard/dashboard': {
@@ -262,6 +282,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccessRoute: AccessRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
