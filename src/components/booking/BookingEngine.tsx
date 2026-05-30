@@ -177,42 +177,34 @@ export function BookingEngine() {
     if (!brand || !model || !slot) return;
 
     setSubmitting(true);
-    const { data, error } = await supabase
-      .from("bookings")
-      .insert({
-        customer_name: customer.name.trim(),
-        customer_phone: customer.phone.trim(),
-        customer_email: customer.email.trim(),
-        street_address: mode === "mobile" ? customer.address.trim() : null,
-        zip,
-        service_mode: mode,
+    try {
+      const draft = {
         brand_id: brand.id,
         model_id: model.id,
+        brand_name: brand.name,
+        model_name: model.name,
         service_ids: serviceIds,
-        brand_name_snapshot: brand.name,
-        model_name_snapshot: model.name,
-        services_snapshot: selectedServiceDetails,
+        services: selectedServiceDetails,
+        zip,
+        service_mode: mode,
+        appointment_at: slot,
+        customer: {
+          name: customer.name.trim(),
+          phone: customer.phone.trim(),
+          email: customer.email.trim(),
+          address: customer.address.trim(),
+        },
         parts_total: partsTotal,
         labor_total: laborTotal,
         travel_fee: travelFee,
         grand_total: grandTotal,
-        appointment_at: slot,
-        pre_repair_checklist: {},
-        post_repair_checklist: {},
-      })
-      .select("id")
-      .single();
-    setSubmitting(false);
-    if (error) {
-      toast.error("Could not confirm booking. Please try again.");
-      return;
+      };
+      sessionStorage.setItem("fiixerr_booking_draft_v1", JSON.stringify(draft));
+      navigate({ to: "/checkout" });
+    } finally {
+      setSubmitting(false);
     }
-    setBookingId(data.id);
   };
-
-  if (bookingId) {
-    return <BookingSuccess id={bookingId} total={grandTotal} slot={slot!} mode={mode} />;
-  }
 
   return (
     <section id="book" aria-labelledby="book-heading" className="mx-auto max-w-7xl px-4 sm:px-5 py-16 sm:py-20">
