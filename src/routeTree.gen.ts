@@ -15,6 +15,7 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AccessRouteImport } from './routes/access'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConfirmationIdRouteImport } from './routes/confirmation.$id'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard.dashboard'
 import { Route as DashboardDashboardTeamRouteImport } from './routes/_dashboard.dashboard.team'
@@ -49,6 +50,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfirmationIdRoute = ConfirmationIdRouteImport.update({
+  id: '/confirmation/$id',
+  path: '/confirmation/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/confirmation/$id': typeof ConfirmationIdRoute
   '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/confirmation/$id': typeof ConfirmationIdRoute
   '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/confirmation/$id': typeof ConfirmationIdRoute
   '/_dashboard/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/_dashboard/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/_dashboard/dashboard/orders': typeof DashboardDashboardOrdersRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/dashboard'
     | '/auth/callback'
+    | '/confirmation/$id'
     | '/dashboard/catalog'
     | '/dashboard/codes'
     | '/dashboard/orders'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/dashboard'
     | '/auth/callback'
+    | '/confirmation/$id'
     | '/dashboard/catalog'
     | '/dashboard/codes'
     | '/dashboard/orders'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/_dashboard/dashboard'
     | '/auth/callback'
+    | '/confirmation/$id'
     | '/_dashboard/dashboard/catalog'
     | '/_dashboard/dashboard/codes'
     | '/_dashboard/dashboard/orders'
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  ConfirmationIdRoute: typeof ConfirmationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -220,6 +233,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confirmation/$id': {
+      id: '/confirmation/$id'
+      path: '/confirmation/$id'
+      fullPath: '/confirmation/$id'
+      preLoaderRoute: typeof ConfirmationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  ConfirmationIdRoute: ConfirmationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
