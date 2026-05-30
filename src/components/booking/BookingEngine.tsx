@@ -277,9 +277,9 @@ export function BookingEngine() {
                 Continue <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             ) : (
-              <Button variant="hero" size="touch" onClick={submit} disabled={submitting} aria-label="Confirm booking">
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Check className="h-4 w-4" aria-hidden="true" />}
-                Confirm booking
+              <Button variant="hero" size="touch" onClick={submit} disabled={submitting} aria-label="Continue to secure checkout">
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Lock className="h-4 w-4" aria-hidden="true" />}
+                Continue to checkout
               </Button>
             )}
           </div>
