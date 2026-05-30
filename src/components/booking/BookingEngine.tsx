@@ -25,6 +25,7 @@ const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
 export function BookingEngine() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [brandId, setBrandId] = useState<string | null>(null);
   const [modelId, setModelId] = useState<string | null>(null);
@@ -35,7 +36,6 @@ export function BookingEngine() {
   const [slot, setSlot] = useState<string | null>(null);
   const [customer, setCustomer] = useState({ name: "", phone: "", email: "", address: "" });
   const [submitting, setSubmitting] = useState(false);
-  const [bookingId, setBookingId] = useState<string | null>(null);
 
   const { data: brands = [] } = useQuery({
     queryKey: ["brands"],
