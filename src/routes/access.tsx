@@ -11,7 +11,7 @@ export const Route = createFileRoute("/access")({
 function AccessPage() {
   async function signInGoogle() {
     await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/dashboard`,
+      redirect_uri: `${window.location.origin}/auth/callback`,
     });
   }
 
