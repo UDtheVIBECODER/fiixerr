@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft, ArrowRight, Check, MapPin, Search, Smartphone,
-  Calendar as CalendarIcon, Loader2, CheckCircle2, ShieldCheck,
+  Calendar as CalendarIcon, Loader2, CheckCircle2, ShieldCheck, Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -24,6 +25,7 @@ const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
 export function BookingEngine() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [brandId, setBrandId] = useState<string | null>(null);
   const [modelId, setModelId] = useState<string | null>(null);
@@ -34,7 +36,6 @@ export function BookingEngine() {
   const [slot, setSlot] = useState<string | null>(null);
   const [customer, setCustomer] = useState({ name: "", phone: "", email: "", address: "" });
   const [submitting, setSubmitting] = useState(false);
-  const [bookingId, setBookingId] = useState<string | null>(null);
 
   const { data: brands = [] } = useQuery({
     queryKey: ["brands"],
@@ -176,42 +177,34 @@ export function BookingEngine() {
     if (!brand || !model || !slot) return;
 
     setSubmitting(true);
-    const { data, error } = await supabase
-      .from("bookings")
-      .insert({
-        customer_name: customer.name.trim(),
-        customer_phone: customer.phone.trim(),
-        customer_email: customer.email.trim(),
-        street_address: mode === "mobile" ? customer.address.trim() : null,
-        zip,
-        service_mode: mode,
+    try {
+      const draft = {
         brand_id: brand.id,
         model_id: model.id,
+        brand_name: brand.name,
+        model_name: model.name,
         service_ids: serviceIds,
-        brand_name_snapshot: brand.name,
-        model_name_snapshot: model.name,
-        services_snapshot: selectedServiceDetails,
+        services: selectedServiceDetails,
+        zip,
+        service_mode: mode,
+        appointment_at: slot,
+        customer: {
+          name: customer.name.trim(),
+          phone: customer.phone.trim(),
+          email: customer.email.trim(),
+          address: customer.address.trim(),
+        },
         parts_total: partsTotal,
         labor_total: laborTotal,
         travel_fee: travelFee,
         grand_total: grandTotal,
-        appointment_at: slot,
-        pre_repair_checklist: {},
-        post_repair_checklist: {},
-      })
-      .select("id")
-      .single();
-    setSubmitting(false);
-    if (error) {
-      toast.error("Could not confirm booking. Please try again.");
-      return;
+      };
+      sessionStorage.setItem("fiixerr_booking_draft_v1", JSON.stringify(draft));
+      navigate({ to: "/checkout" });
+    } finally {
+      setSubmitting(false);
     }
-    setBookingId(data.id);
   };
-
-  if (bookingId) {
-    return <BookingSuccess id={bookingId} total={grandTotal} slot={slot!} mode={mode} />;
-  }
 
   return (
     <section id="book" aria-labelledby="book-heading" className="mx-auto max-w-7xl px-4 sm:px-5 py-16 sm:py-20">
@@ -284,9 +277,9 @@ export function BookingEngine() {
                 Continue <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             ) : (
-              <Button variant="hero" size="touch" onClick={submit} disabled={submitting} aria-label="Confirm booking">
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Check className="h-4 w-4" aria-hidden="true" />}
-                Confirm booking
+              <Button variant="hero" size="touch" onClick={submit} disabled={submitting} aria-label="Continue to secure checkout">
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Lock className="h-4 w-4" aria-hidden="true" />}
+                Continue to checkout
               </Button>
             )}
           </div>

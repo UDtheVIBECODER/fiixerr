@@ -11,11 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AccessRouteImport } from './routes/access'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConfirmationIdRouteImport } from './routes/confirmation.$id'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard.dashboard'
 import { Route as DashboardDashboardTeamRouteImport } from './routes/_dashboard.dashboard.team'
+import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard.dashboard.settings'
 import { Route as DashboardDashboardOrdersRouteImport } from './routes/_dashboard.dashboard.orders'
 import { Route as DashboardDashboardCodesRouteImport } from './routes/_dashboard.dashboard.codes'
 import { Route as DashboardDashboardCatalogRouteImport } from './routes/_dashboard.dashboard.catalog'
@@ -28,6 +32,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccessRoute = AccessRouteImport.update({
@@ -44,6 +53,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfirmationIdRoute = ConfirmationIdRouteImport.update({
+  id: '/confirmation/$id',
+  path: '/confirmation/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -54,6 +73,12 @@ const DashboardDashboardTeamRoute = DashboardDashboardTeamRouteImport.update({
   path: '/team',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
+const DashboardDashboardSettingsRoute =
+  DashboardDashboardSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 const DashboardDashboardOrdersRoute =
   DashboardDashboardOrdersRouteImport.update({
     id: '/orders',
@@ -75,23 +100,31 @@ const DashboardDashboardCatalogRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access': typeof AccessRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/auth/callback': typeof AuthCallbackRoute
+  '/confirmation/$id': typeof ConfirmationIdRoute
   '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
+  '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/team': typeof DashboardDashboardTeamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/access': typeof AccessRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/auth/callback': typeof AuthCallbackRoute
+  '/confirmation/$id': typeof ConfirmationIdRoute
   '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
+  '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/team': typeof DashboardDashboardTeamRoute
 }
 export interface FileRoutesById {
@@ -99,12 +132,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_dashboard': typeof DashboardRouteWithChildren
   '/access': typeof AccessRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/auth/callback': typeof AuthCallbackRoute
+  '/confirmation/$id': typeof ConfirmationIdRoute
   '/_dashboard/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/_dashboard/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/_dashboard/dashboard/orders': typeof DashboardDashboardOrdersRoute
+  '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/_dashboard/dashboard/team': typeof DashboardDashboardTeamRoute
 }
 export interface FileRouteTypes {
@@ -112,35 +149,47 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/access'
+    | '/checkout'
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/auth/callback'
+    | '/confirmation/$id'
     | '/dashboard/catalog'
     | '/dashboard/codes'
     | '/dashboard/orders'
+    | '/dashboard/settings'
     | '/dashboard/team'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/access'
+    | '/checkout'
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/auth/callback'
+    | '/confirmation/$id'
     | '/dashboard/catalog'
     | '/dashboard/codes'
     | '/dashboard/orders'
+    | '/dashboard/settings'
     | '/dashboard/team'
   id:
     | '__root__'
     | '/'
     | '/_dashboard'
     | '/access'
+    | '/checkout'
     | '/login'
     | '/register'
     | '/_dashboard/dashboard'
+    | '/auth/callback'
+    | '/confirmation/$id'
     | '/_dashboard/dashboard/catalog'
     | '/_dashboard/dashboard/codes'
     | '/_dashboard/dashboard/orders'
+    | '/_dashboard/dashboard/settings'
     | '/_dashboard/dashboard/team'
   fileRoutesById: FileRoutesById
 }
@@ -148,8 +197,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   AccessRoute: typeof AccessRoute
+  CheckoutRoute: typeof CheckoutRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  ConfirmationIdRoute: typeof ConfirmationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -166,6 +218,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/access': {
@@ -189,6 +248,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/confirmation/$id': {
+      id: '/confirmation/$id'
+      path: '/confirmation/$id'
+      fullPath: '/confirmation/$id'
+      preLoaderRoute: typeof ConfirmationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_dashboard/dashboard': {
       id: '/_dashboard/dashboard'
       path: '/dashboard'
@@ -201,6 +274,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/dashboard/team'
       preLoaderRoute: typeof DashboardDashboardTeamRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
+    '/_dashboard/dashboard/settings': {
+      id: '/_dashboard/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardDashboardSettingsRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
     '/_dashboard/dashboard/orders': {
@@ -231,6 +311,7 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardCatalogRoute: typeof DashboardDashboardCatalogRoute
   DashboardDashboardCodesRoute: typeof DashboardDashboardCodesRoute
   DashboardDashboardOrdersRoute: typeof DashboardDashboardOrdersRoute
+  DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
   DashboardDashboardTeamRoute: typeof DashboardDashboardTeamRoute
 }
 
@@ -238,6 +319,7 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardCatalogRoute: DashboardDashboardCatalogRoute,
   DashboardDashboardCodesRoute: DashboardDashboardCodesRoute,
   DashboardDashboardOrdersRoute: DashboardDashboardOrdersRoute,
+  DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
   DashboardDashboardTeamRoute: DashboardDashboardTeamRoute,
 }
 
@@ -260,19 +342,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
   AccessRoute: AccessRoute,
+  CheckoutRoute: CheckoutRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  ConfirmationIdRoute: ConfirmationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

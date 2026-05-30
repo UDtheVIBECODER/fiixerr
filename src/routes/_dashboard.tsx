@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyProfile } from "@/hooks/useMyProfile";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
-import { LogOut, Wrench, ClipboardList, Settings, KeyRound, Users } from "lucide-react";
+import { LogOut, Wrench, ClipboardList, Settings, KeyRound, Users, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/_dashboard")({
   beforeLoad: async () => {
@@ -69,6 +69,7 @@ function DashboardLayout() {
         <nav className="space-y-1">
           <NavItem to="/dashboard/orders" icon={<ClipboardList className="h-4 w-4" />}>Orders</NavItem>
           {isAdminOrUp && <NavItem to="/dashboard/catalog" icon={<Settings className="h-4 w-4" />}>Catalog & Pricing</NavItem>}
+          {isUltimate && <NavItem to="/dashboard/settings" icon={<CreditCard className="h-4 w-4" />}>Payment Settings</NavItem>}
           {isUltimate && <NavItem to="/dashboard/codes" icon={<KeyRound className="h-4 w-4" />}>Registration Codes</NavItem>}
           {isUltimate && <NavItem to="/dashboard/team" icon={<Users className="h-4 w-4" />}>Team</NavItem>}
         </nav>
