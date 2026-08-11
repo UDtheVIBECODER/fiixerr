@@ -108,6 +108,19 @@
 
   button, a[role="button"], [type="button"], [type="submit"] {
     touch-action: manipulation;
+    cursor: pointer;
+  }
+
+  button:disabled, [type="submit"]:disabled, [type="button"]:disabled {
+    cursor: not-allowed;
+  }
+
+  a {
+    cursor: pointer;
+  }
+
+  select {
+    cursor: pointer;
   }
 }
 

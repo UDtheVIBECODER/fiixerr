@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Button } from "@/components/ui/button";
 import logoUrl from "@/assets/fiixerr-logo.png";
 

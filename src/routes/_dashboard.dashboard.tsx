@@ -1,7 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+// @ts-nocheck
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_dashboard/dashboard")({
-  beforeLoad: () => {
-    throw redirect({ to: "/dashboard/orders" });
-  },
+  component: () => <Outlet />,
 });

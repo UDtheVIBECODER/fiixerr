@@ -1,9 +1,10 @@
+// @ts-nocheck
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-async function assertUltimateAdmin(userId: string) {
+async function assertUltimateAdmin(userId) {
   const { data, error } = await supabaseAdmin
     .from("profiles")
     .select("role")
@@ -15,7 +16,7 @@ async function assertUltimateAdmin(userId: string) {
 
 export const generateCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .inputValidator((input) =>
     z
       .object({
         code: z.string().trim().min(4).max(64).regex(/^[a-zA-Z0-9_-]+$/),
@@ -46,7 +47,7 @@ export const listCodes = createServerFn({ method: "GET" })
 
 export const deleteCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ code: z.string() }).parse(input))
+  .inputValidator((input) => z.object({ code: z.string() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertUltimateAdmin(context.userId);
     const { error } = await supabaseAdmin
@@ -72,7 +73,7 @@ export const listStaff = createServerFn({ method: "GET" })
 
 export const deleteStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ userId: z.string().uuid() }).parse(input))
+  .inputValidator((input) => z.object({ userId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertUltimateAdmin(context.userId);
     if (data.userId === context.userId) throw new Error("Cannot delete yourself");

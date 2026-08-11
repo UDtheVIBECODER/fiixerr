@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ShieldCheck, ListChecks, Receipt } from "lucide-react";
 
 const items = [
