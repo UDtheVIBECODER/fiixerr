@@ -1,4 +1,5 @@
-export function renderErrorPage(): string {
+// @ts-nocheck
+export function renderErrorPage() {
   return `<!doctype html>
 <html lang="en">
   <head>

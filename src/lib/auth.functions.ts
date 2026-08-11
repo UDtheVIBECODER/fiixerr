@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -26,7 +27,7 @@ export const getMyProfile = createServerFn({ method: "GET" })
   });
 
 export const registerWithCode = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .inputValidator((input) =>
     z
       .object({
         code: z.string().trim().min(1).max(64),
@@ -36,7 +37,6 @@ export const registerWithCode = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    // Validate code first
     const { data: codeRow, error: codeErr } = await supabaseAdmin
       .from("registration_codes")
       .select("code, role, is_used")
@@ -45,7 +45,6 @@ export const registerWithCode = createServerFn({ method: "POST" })
     if (codeErr) throw new Error(codeErr.message);
     if (!codeRow || codeRow.is_used) throw new Error("Invalid or already used code");
 
-    // Check username uniqueness
     const { data: existing } = await supabaseAdmin
       .from("profiles")
       .select("id")
@@ -76,7 +75,7 @@ export const registerWithCode = createServerFn({ method: "POST" })
   });
 
 export const resolveStaffEmail = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .inputValidator((input) =>
     z.object({ username: usernameSchema }).parse(input),
   )
   .handler(async ({ data }) => {

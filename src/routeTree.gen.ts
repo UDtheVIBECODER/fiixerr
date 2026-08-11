@@ -9,9 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SetupRouteImport } from './routes/setup'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CustomerLoginRouteImport } from './routes/customer-login'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as BookRouteImport } from './routes/book'
 import { Route as AccessRouteImport } from './routes/access'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,7 +26,13 @@ import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashbo
 import { Route as DashboardDashboardOrdersRouteImport } from './routes/_dashboard.dashboard.orders'
 import { Route as DashboardDashboardCodesRouteImport } from './routes/_dashboard.dashboard.codes'
 import { Route as DashboardDashboardCatalogRouteImport } from './routes/_dashboard.dashboard.catalog'
+import { Route as DashboardDashboardAdminRouteImport } from './routes/_dashboard.dashboard.admin'
 
+const SetupRoute = SetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -34,9 +43,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomerLoginRoute = CustomerLoginRouteImport.update({
+  id: '/customer-login',
+  path: '/customer-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookRoute = BookRouteImport.update({
+  id: '/book',
+  path: '/book',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccessRoute = AccessRouteImport.update({
@@ -96,16 +115,25 @@ const DashboardDashboardCatalogRoute =
     path: '/catalog',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
+const DashboardDashboardAdminRoute = DashboardDashboardAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access': typeof AccessRoute
+  '/book': typeof BookRoute
   '/checkout': typeof CheckoutRoute
+  '/customer-login': typeof CustomerLoginRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/setup': typeof SetupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/confirmation/$id': typeof ConfirmationIdRoute
+  '/dashboard/admin': typeof DashboardDashboardAdminRoute
   '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
@@ -115,12 +143,16 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/access': typeof AccessRoute
+  '/book': typeof BookRoute
   '/checkout': typeof CheckoutRoute
+  '/customer-login': typeof CustomerLoginRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/setup': typeof SetupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/confirmation/$id': typeof ConfirmationIdRoute
+  '/dashboard/admin': typeof DashboardDashboardAdminRoute
   '/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/dashboard/orders': typeof DashboardDashboardOrdersRoute
@@ -132,12 +164,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_dashboard': typeof DashboardRouteWithChildren
   '/access': typeof AccessRoute
+  '/book': typeof BookRoute
   '/checkout': typeof CheckoutRoute
+  '/customer-login': typeof CustomerLoginRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/setup': typeof SetupRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/confirmation/$id': typeof ConfirmationIdRoute
+  '/_dashboard/dashboard/admin': typeof DashboardDashboardAdminRoute
   '/_dashboard/dashboard/catalog': typeof DashboardDashboardCatalogRoute
   '/_dashboard/dashboard/codes': typeof DashboardDashboardCodesRoute
   '/_dashboard/dashboard/orders': typeof DashboardDashboardOrdersRoute
@@ -149,12 +185,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/access'
+    | '/book'
     | '/checkout'
+    | '/customer-login'
     | '/login'
     | '/register'
+    | '/setup'
     | '/dashboard'
     | '/auth/callback'
     | '/confirmation/$id'
+    | '/dashboard/admin'
     | '/dashboard/catalog'
     | '/dashboard/codes'
     | '/dashboard/orders'
@@ -164,12 +204,16 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/access'
+    | '/book'
     | '/checkout'
+    | '/customer-login'
     | '/login'
     | '/register'
+    | '/setup'
     | '/dashboard'
     | '/auth/callback'
     | '/confirmation/$id'
+    | '/dashboard/admin'
     | '/dashboard/catalog'
     | '/dashboard/codes'
     | '/dashboard/orders'
@@ -180,12 +224,16 @@ export interface FileRouteTypes {
     | '/'
     | '/_dashboard'
     | '/access'
+    | '/book'
     | '/checkout'
+    | '/customer-login'
     | '/login'
     | '/register'
+    | '/setup'
     | '/_dashboard/dashboard'
     | '/auth/callback'
     | '/confirmation/$id'
+    | '/_dashboard/dashboard/admin'
     | '/_dashboard/dashboard/catalog'
     | '/_dashboard/dashboard/codes'
     | '/_dashboard/dashboard/orders'
@@ -197,15 +245,25 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   AccessRoute: typeof AccessRoute
+  BookRoute: typeof BookRoute
   CheckoutRoute: typeof CheckoutRoute
+  CustomerLoginRoute: typeof CustomerLoginRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  SetupRoute: typeof SetupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   ConfirmationIdRoute: typeof ConfirmationIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -220,11 +278,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/customer-login': {
+      id: '/customer-login'
+      path: '/customer-login'
+      fullPath: '/customer-login'
+      preLoaderRoute: typeof CustomerLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout': {
       id: '/checkout'
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/book': {
+      id: '/book'
+      path: '/book'
+      fullPath: '/book'
+      preLoaderRoute: typeof BookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/access': {
@@ -304,10 +376,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardCatalogRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/admin': {
+      id: '/_dashboard/dashboard/admin'
+      path: '/admin'
+      fullPath: '/dashboard/admin'
+      preLoaderRoute: typeof DashboardDashboardAdminRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
   }
 }
 
 interface DashboardDashboardRouteChildren {
+  DashboardDashboardAdminRoute: typeof DashboardDashboardAdminRoute
   DashboardDashboardCatalogRoute: typeof DashboardDashboardCatalogRoute
   DashboardDashboardCodesRoute: typeof DashboardDashboardCodesRoute
   DashboardDashboardOrdersRoute: typeof DashboardDashboardOrdersRoute
@@ -316,6 +396,7 @@ interface DashboardDashboardRouteChildren {
 }
 
 const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
+  DashboardDashboardAdminRoute: DashboardDashboardAdminRoute,
   DashboardDashboardCatalogRoute: DashboardDashboardCatalogRoute,
   DashboardDashboardCodesRoute: DashboardDashboardCodesRoute,
   DashboardDashboardOrdersRoute: DashboardDashboardOrdersRoute,
@@ -342,12 +423,25 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
   AccessRoute: AccessRoute,
+  BookRoute: BookRoute,
   CheckoutRoute: CheckoutRoute,
+  CustomerLoginRoute: CustomerLoginRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  SetupRoute: SetupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   ConfirmationIdRoute: ConfirmationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
