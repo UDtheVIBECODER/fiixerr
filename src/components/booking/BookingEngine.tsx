@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { LocationPicker } from "@/components/booking/LocationPicker";
 
 const STEPS = ["Brand", "Model", "Services", "Logistics", "Schedule", "Details"];
 
@@ -30,6 +31,10 @@ export function BookingEngine() {
   const [mode, setMode] = useState("mobile");
   const [slot, setSlot] = useState(null);
   const [customer, setCustomer] = useState({ name: "", phone: "", email: "", address: "" });
+  const [pickupLat, setPickupLat] = useState(null);
+  const [pickupLng, setPickupLng] = useState(null);
+  const [pickupAddress, setPickupAddress] = useState("");
+  const [rideFee, setRideFee] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
 
@@ -38,6 +43,20 @@ export function BookingEngine() {
       setIsGuest(!data.session);
     });
   }, []);
+
+  // Reset pickup location when zip or mode changes
+  useEffect(() => {
+    setPickupLat(null);
+    setPickupLng(null);
+    setRideFee(0);
+  }, [zip, mode]);
+
+  // Pre-fill customer address from pickup when reaching intake step
+  useEffect(() => {
+    if (step === 5 && mode === "mobile" && pickupAddress && !customer.address) {
+      setCustomer((c) => ({ ...c, address: pickupAddress }));
+    }
+  }, [step]);
 
   const { data: brands = [] } = useQuery({
     queryKey: ["brands"],
@@ -117,7 +136,7 @@ export function BookingEngine() {
 
   const partsTotal = selectedServiceDetails.reduce((a, s) => a + s.part_cost, 0);
   const laborTotal = selectedServiceDetails.reduce((a, s) => a + s.labor_fee, 0);
-  const travelFee = mode === "mobile" && zipRow ? Number(zipRow.travel_fee) : 0;
+  const travelFee = mode === "mobile" ? rideFee : 0;
   const grandTotal = partsTotal + laborTotal + travelFee;
 
   const canNext = () => {
@@ -125,7 +144,7 @@ export function BookingEngine() {
       case 0: return !!brandId;
       case 1: return !!modelId;
       case 2: return serviceIds.length > 0;
-      case 3: return zip.length === 5 && !!zipRow;
+      case 3: return zip.length === 5 && !!zipRow && (mode !== "mobile" || pickupLat !== null);
       case 4: return !!slot;
       case 5: return true;
       default: return false;
@@ -200,6 +219,10 @@ export function BookingEngine() {
         labor_total: laborTotal,
         travel_fee: travelFee,
         grand_total: grandTotal,
+        pickup_lat: pickupLat,
+        pickup_lng: pickupLng,
+        pickup_address: pickupAddress,
+        ride_fee: rideFee,
       };
       sessionStorage.setItem("fiixerr_booking_draft_v1", JSON.stringify(draft));
       navigate({ to: "/checkout" });
@@ -248,6 +271,13 @@ export function BookingEngine() {
             {step === 3 && (
               <LogisticsStep
                 zip={zip} setZip={setZip} zipRow={zipRow} mode={mode} setMode={setMode}
+                pickupLat={pickupLat}
+                onLocationSet={(lat, lng, addr, fee) => {
+                  setPickupLat(lat);
+                  setPickupLng(lng);
+                  setPickupAddress(addr);
+                  setRideFee(fee);
+                }}
               />
             )}
             {step === 4 && <ScheduleStep days={timeSlots} value={slot} onChange={setSlot} />}
@@ -454,7 +484,7 @@ function ServicesStep({ services, pricing, selected, toggle }) {
   );
 }
 
-function LogisticsStep({ zip, setZip, zipRow, mode, setMode }) {
+function LogisticsStep({ zip, setZip, zipRow, mode, setMode, pickupLat, onLocationSet }) {
   const valid = zip.length === 5 && !!zipRow;
   const invalid = zip.length === 5 && zipRow === null;
   return (
@@ -486,7 +516,7 @@ function LogisticsStep({ zip, setZip, zipRow, mode, setMode }) {
 
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
         {[
-          { v: "mobile", title: "Come to me", sub: "Mobile repair at your address", fee: zipRow ? `+${fmt(Number(zipRow.travel_fee))} travel` : "Travel quoted at checkout" },
+          { v: "mobile", title: "Come to me", sub: "Mobile repair at your address", fee: "Ride fee calculated by distance" },
           { v: "dropoff", title: "Drop-off / Meet-up", sub: "Bring it to our nearest tech", fee: "No travel fee" },
         ].map((opt) => {
           const active = mode === opt.v;
@@ -516,6 +546,17 @@ function LogisticsStep({ zip, setZip, zipRow, mode, setMode }) {
           );
         })}
       </div>
+
+      {valid && mode === "mobile" && (
+        <div className="mt-6">
+          <Label className="text-sm font-medium">Pin your pickup location</Label>
+          <p className="text-xs text-muted-foreground mt-1 mb-3">
+            Search your address or click the map. The ride fee is calculated from the nearest service hub.
+            {!pickupLat && <span className="text-destructive ml-1">Required to continue.</span>}
+          </p>
+          <LocationPicker onLocationSet={onLocationSet} />
+        </div>
+      )}
     </div>
   );
 }
@@ -637,7 +678,7 @@ function PriceSummary({ brand, model, services, partsTotal, laborTotal, travelFe
         <Row label="Parts" v={fmt(partsTotal)} />
         <Row label="Labor" v={fmt(laborTotal)} />
         <Row
-          label={mode === "mobile" ? `Travel ${zip && zipOk ? `(${zip})` : ""}` : "Travel"}
+          label={mode === "mobile" ? "Ride fee" : "Travel"}
           v={mode === "mobile" ? fmt(travelFee) : fmt(0)}
         />
       </div>

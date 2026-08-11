@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle2, ShieldCheck, Calendar, MapPin, Phone } from "lucide-react";
 
@@ -25,7 +26,7 @@ function ConfirmationPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, customer_name, customer_email, customer_phone, brand_name_snapshot, model_name_snapshot, services_snapshot, grand_total, appointment_at, service_mode, street_address, zip, status")
+        .select("id, customer_name, customer_email, customer_phone, brand_name_snapshot, model_name_snapshot, services_snapshot, grand_total, appointment_at, service_mode, street_address, zip, status, pickup_lat, pickup_lng, pickup_address, ride_fee")
         .eq("id", id)
         .maybeSingle();
       if (error) throw new Error(error.message);
@@ -107,6 +108,18 @@ function ConfirmationPage() {
             </div>
           </div>
 
+          {data.service_mode === "mobile" && data.pickup_lat && data.pickup_lng && (
+            <div className="mt-8">
+              <h2 className="text-base font-semibold text-foreground mb-3">Your pickup location</h2>
+              <ConfirmationMap lat={data.pickup_lat} lng={data.pickup_lng} />
+              {data.ride_fee > 0 && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Ride fee: <span className="font-medium text-foreground">${Number(data.ride_fee).toFixed(2)}</span>
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="mt-8 rounded-xl bg-[var(--surface)] border border-border p-5 text-sm text-foreground/80">
             <strong className="text-foreground">Lifetime parts warranty.</strong> Every replacement part Fiixerr installs is covered for as long as you own the device. If anything fails from a manufacturing defect, we replace it free of charge.
           </div>
@@ -134,5 +147,56 @@ function Stat({ icon, k, v }) {
       </div>
       <div className="mt-1.5 font-semibold text-foreground">{v}</div>
     </div>
+  );
+}
+
+function ConfirmationMap({ lat, lng }: { lat: number; lng: number }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return;
+    let cancelled = false;
+
+    import("leaflet").then((Lmod) => {
+      const L = (Lmod as any).default ?? Lmod;
+      if (cancelled || !containerRef.current) return;
+
+      const map = L.map(containerRef.current, {
+        zoomControl: true,
+        scrollWheelZoom: false,
+        dragging: false,
+      }).setView([lat, lng], 14);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }).addTo(map);
+
+      const icon = L.divIcon({
+        html: '<div style="width:18px;height:18px;border-radius:50%;background:#0f2c4a;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.4)"></div>',
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        className: "",
+      });
+      L.marker([lat, lng], { icon }).addTo(map);
+      mapRef.current = map;
+    });
+
+    return () => {
+      cancelled = true;
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, [lat, lng]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full rounded-xl overflow-hidden border border-border"
+      style={{ height: 220 }}
+      aria-label="Pickup location map"
+    />
   );
 }
