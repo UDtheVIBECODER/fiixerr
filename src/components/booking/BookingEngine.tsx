@@ -14,8 +14,9 @@ import {
 import { toast } from "sonner";
 import { z } from "zod";
 import { LocationPicker } from "@/components/booking/LocationPicker";
+import { nearestAdmin, calcRideFee } from "@/lib/geo";
 
-const STEPS = ["Brand", "Model", "Services", "Logistics", "Schedule", "Details"];
+const STEPS = ["Brand", "Model", "Services", "Schedule", "Logistics", "Details"];
 
 const fmt = (n) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -57,6 +58,23 @@ export function BookingEngine() {
       setCustomer((c) => ({ ...c, address: pickupAddress }));
     }
   }, [step]);
+
+  // Re-calculate ride fee when appointment slot is chosen and pickup location is already set
+  useEffect(() => {
+    if (!slot || !pickupLat || !pickupLng || mode !== "mobile") return;
+    supabase
+      .rpc("get_available_worker_locations", { appointment_at: slot })
+      .then(async ({ data: workers }) => {
+        let locations = workers && workers.length > 0 ? workers : null;
+        if (!locations) {
+          const { data: hubs } = await supabase
+            .from("admin_locations").select("id, name, lat, lng").eq("active", true);
+          locations = hubs ?? [];
+        }
+        const result = nearestAdmin(pickupLat, pickupLng, locations);
+        if (result) setRideFee(result.fee);
+      });
+  }, [slot]);
 
   const { data: brands = [] } = useQuery({
     queryKey: ["brands"],
@@ -144,8 +162,8 @@ export function BookingEngine() {
       case 0: return !!brandId;
       case 1: return !!modelId;
       case 2: return serviceIds.length > 0;
-      case 3: return zip.length === 5 && !!zipRow && (mode !== "mobile" || pickupLat !== null);
-      case 4: return !!slot;
+      case 3: return !!slot;
+      case 4: return zip.length === 5 && !!zipRow && (mode !== "mobile" || pickupLat !== null);
       case 5: return true;
       default: return false;
     }
@@ -268,10 +286,12 @@ export function BookingEngine() {
                 toggle={(id) => setServiceIds((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id])}
               />
             )}
-            {step === 3 && (
+            {step === 3 && <ScheduleStep days={timeSlots} value={slot} onChange={setSlot} />}
+            {step === 4 && (
               <LogisticsStep
                 zip={zip} setZip={setZip} zipRow={zipRow} mode={mode} setMode={setMode}
                 pickupLat={pickupLat}
+                slot={slot}
                 onLocationSet={(lat, lng, addr, fee) => {
                   setPickupLat(lat);
                   setPickupLng(lng);
@@ -280,7 +300,6 @@ export function BookingEngine() {
                 }}
               />
             )}
-            {step === 4 && <ScheduleStep days={timeSlots} value={slot} onChange={setSlot} />}
             {step === 5 && (
               <IntakeStep
                 mode={mode}
@@ -484,12 +503,12 @@ function ServicesStep({ services, pricing, selected, toggle }) {
   );
 }
 
-function LogisticsStep({ zip, setZip, zipRow, mode, setMode, pickupLat, onLocationSet }) {
+function LogisticsStep({ zip, setZip, zipRow, mode, setMode, pickupLat, onLocationSet, slot }) {
   const valid = zip.length === 5 && !!zipRow;
   const invalid = zip.length === 5 && zipRow === null;
   return (
     <div>
-      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 4: Where should we meet?</h3>
+      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 5: Where should we meet?</h3>
       <p className="text-foreground/75 mt-2 text-base">Enter your zip code. We'll confirm coverage and quote travel upfront.</p>
 
       <div className="mt-6">
@@ -551,10 +570,10 @@ function LogisticsStep({ zip, setZip, zipRow, mode, setMode, pickupLat, onLocati
         <div className="mt-6">
           <Label className="text-sm font-medium">Pin your pickup location</Label>
           <p className="text-xs text-muted-foreground mt-1 mb-3">
-            Search your address or click the map. The ride fee is calculated from the nearest service hub.
+            Search your address or click the map. The ride fee is calculated from the nearest available technician.
             {!pickupLat && <span className="text-destructive ml-1">Required to continue.</span>}
           </p>
-          <LocationPicker onLocationSet={onLocationSet} />
+          <LocationPicker onLocationSet={onLocationSet} appointmentAt={slot ?? undefined} />
         </div>
       )}
     </div>
@@ -565,7 +584,7 @@ function ScheduleStep({ days, value, onChange }) {
   const [selectedDay, setSelectedDay] = useState(0);
   return (
     <div>
-      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 5: Pick a date and time</h3>
+      <h3 className="text-2xl font-bold tracking-tight text-foreground">Step 4: Pick a date and time</h3>
       <p className="text-foreground/75 mt-2 text-base">Same-week availability. Reschedule for free up to 2 hours before.</p>
 
       <div className="mt-6 flex gap-2 overflow-x-auto pb-2">

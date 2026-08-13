@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { nearestAdmin, type AdminLocation } from "@/lib/geo";
+import { Navigation, X } from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "#f59e0b",
@@ -27,16 +28,47 @@ interface Booking {
   ride_fee: number | null;
 }
 
+interface RouteInfo {
+  booking: Booking;
+  hubName: string;
+  distanceMi: number;
+  durationMin: number;
+}
+
+async function fetchOsrmRoute(
+  fromLat: number,
+  fromLng: number,
+  toLat: number,
+  toLng: number,
+) {
+  const url =
+    `https://router.project-osrm.org/route/v1/driving/` +
+    `${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const json = await res.json();
+  const route = json.routes?.[0];
+  if (!route) return null;
+  return {
+    geometry: route.geometry,          // GeoJSON LineString
+    distanceMi: route.distance / 1609.34,
+    durationMin: Math.round(route.duration / 60),
+  };
+}
+
 export function BookingsMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const LRef = useRef<any>(null);
   const bookingMarkersRef = useRef<Map<string, any>>(new Map());
   const adminMarkersRef = useRef<any[]>([]);
+  const routeLineRef = useRef<any>(null);
   const [mapReady, setMapReady] = useState(false);
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [admins, setAdmins] = useState<AdminLocation[]>([]);
+  const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
+  const [routeLoading, setRouteLoading] = useState(false);
 
   const adminsRef = useRef<AdminLocation[]>([]);
   useEffect(() => {
@@ -151,14 +183,13 @@ export function BookingsMap() {
     });
   }, [mapReady, admins]);
 
-  // Render booking markers (recreate on every change for simplicity)
+  // Render booking markers
   useEffect(() => {
     if (!mapReady) return;
     const L = LRef.current;
     const map = mapRef.current;
     if (!L || !map) return;
 
-    // Remove all old booking markers
     bookingMarkersRef.current.forEach((m) => m.remove());
     bookingMarkersRef.current.clear();
 
@@ -174,14 +205,69 @@ export function BookingsMap() {
       const marker = L.marker([b.pickup_lat, b.pickup_lng], { icon })
         .bindPopup(buildPopup(b, adminsRef.current))
         .addTo(map);
+
+      // On click: draw OSRM route from nearest hub
+      marker.on("click", () => handleBookingClick(b));
+
       bookingMarkersRef.current.set(b.id, marker);
     });
   }, [mapReady, bookings]);
+
+  async function handleBookingClick(b: Booking) {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !b.pickup_lat || !b.pickup_lng) return;
+
+    // Clear previous route line
+    if (routeLineRef.current) {
+      routeLineRef.current.remove();
+      routeLineRef.current = null;
+    }
+    setRouteInfo(null);
+
+    const nearest = nearestAdmin(b.pickup_lat, b.pickup_lng, adminsRef.current);
+    if (!nearest) return;
+
+    setRouteLoading(true);
+    try {
+      const route = await fetchOsrmRoute(
+        nearest.admin.lat,
+        nearest.admin.lng,
+        b.pickup_lat,
+        b.pickup_lng,
+      );
+      if (!route) return;
+
+      routeLineRef.current = L.geoJSON(route.geometry, {
+        style: { color: "#2563eb", weight: 5, opacity: 0.85 },
+      }).addTo(map);
+
+      map.fitBounds(routeLineRef.current.getBounds(), { padding: [48, 48] });
+
+      setRouteInfo({
+        booking: b,
+        hubName: nearest.admin.name,
+        distanceMi: route.distanceMi,
+        durationMin: route.durationMin,
+      });
+    } finally {
+      setRouteLoading(false);
+    }
+  }
+
+  function clearRoute() {
+    if (routeLineRef.current) {
+      routeLineRef.current.remove();
+      routeLineRef.current = null;
+    }
+    setRouteInfo(null);
+  }
 
   const located = bookings.filter((b) => b.pickup_lat).length;
 
   return (
     <div className="space-y-3">
+      {/* Legend */}
       <div className="flex items-center gap-4 flex-wrap text-sm">
         {Object.entries(STATUS_COLORS).map(([s, c]) => (
           <div key={s} className="flex items-center gap-1.5">
@@ -195,6 +281,7 @@ export function BookingsMap() {
         </div>
       </div>
 
+      {/* Map */}
       <div
         ref={containerRef}
         className="w-full rounded-xl overflow-hidden border border-border"
@@ -202,8 +289,54 @@ export function BookingsMap() {
         aria-label="Live bookings map"
       />
 
+      {/* Route info panel */}
+      {routeLoading && (
+        <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground animate-pulse">
+          Calculating fastest route…
+        </div>
+      )}
+
+      {routeInfo && !routeLoading && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800 px-4 py-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <Navigation className="h-4 w-4 text-blue-600 shrink-0" />
+                <span className="font-semibold text-foreground">{routeInfo.booking.customer_name}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full capitalize font-medium"
+                  style={{ background: STATUS_COLORS[routeInfo.booking.status] + "22", color: STATUS_COLORS[routeInfo.booking.status] }}>
+                  {routeInfo.booking.status.replace("_", " ")}
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground truncate">
+                {routeInfo.booking.pickup_address || routeInfo.booking.street_address || "No address on file"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                From hub: <span className="font-medium text-foreground">{routeInfo.hubName}</span>
+              </p>
+            </div>
+            <div className="text-right shrink-0 space-y-1">
+              <p className="text-xl font-bold text-foreground">{routeInfo.distanceMi.toFixed(1)} mi</p>
+              <p className="text-sm text-muted-foreground">{routeInfo.durationMin} min drive</p>
+              <p className="text-xs text-muted-foreground">
+                {new Date(routeInfo.booking.appointment_at).toLocaleString("en-US", {
+                  weekday: "short", month: "short", day: "numeric",
+                  hour: "numeric", minute: "2-digit",
+                })}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={clearRoute}
+            className="mt-2 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="h-3 w-3" /> Clear route
+          </button>
+        </div>
+      )}
+
       <p className="text-xs text-muted-foreground">
-        {located} mobile booking{located !== 1 ? "s" : ""} with location data · updates in real time
+        {located} mobile booking{located !== 1 ? "s" : ""} with location data · updates in real time · click a pin to see the fastest route
       </p>
     </div>
   );
@@ -222,14 +355,16 @@ function buildPopup(b: Booking, admins: AdminLocation[]): string {
       ? nearestAdmin(b.pickup_lat, b.pickup_lng, admins)
       : null;
   const dist = nearest ? `${(nearest.distanceKm * 0.621371).toFixed(1)} mi` : "—";
+  const address = b.pickup_address || b.street_address || "—";
 
   return `
-    <div style="min-width:210px;font-size:13px;line-height:1.6">
+    <div style="min-width:220px;font-size:13px;line-height:1.6">
       <strong style="font-size:14px">${b.customer_name}</strong><br>
       ${b.brand_name_snapshot} ${b.model_name_snapshot}<br>
       <span style="text-transform:capitalize;color:#6b7280">${b.status.replace("_", " ")}</span> · ${when}<br>
-      ${b.pickup_address ? `<small style="color:#9ca3af">${b.pickup_address}</small><br>` : ""}
-      <small>From hub: ${dist} · Ride fee: $${Number(b.ride_fee ?? 0).toFixed(2)}</small>
+      <small style="color:#6b7280">${address}</small><br>
+      <small style="color:#9ca3af">Hub distance: ${dist} · Ride fee: $${Number(b.ride_fee ?? 0).toFixed(2)}</small><br>
+      <small style="color:#2563eb;font-style:italic">Click pin to show driving route ↓</small>
     </div>
   `;
 }

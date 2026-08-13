@@ -124,10 +124,17 @@ function ConfirmationPage() {
             <strong className="text-foreground">Lifetime parts warranty.</strong> Every replacement part Fiixerr installs is covered for as long as you own the device. If anything fails from a manufacturing defect, we replace it free of charge.
           </div>
 
-          <div className="mt-8 text-center">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href="tel:4302429880"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-foreground text-background px-5 py-3 text-base font-semibold min-h-[48px] w-full sm:w-auto"
+            >
+              <Phone className="h-5 w-5" />
+              Call Us
+            </a>
             <Link
               to="/"
-              className="inline-flex items-center justify-center rounded-md bg-foreground text-background px-5 py-3 text-base font-semibold min-h-[48px]"
+              className="inline-flex items-center justify-center rounded-md border-2 border-foreground text-foreground px-5 py-3 text-base font-semibold min-h-[48px] w-full sm:w-auto"
             >
               Back to homepage
             </Link>
