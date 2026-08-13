@@ -69,6 +69,7 @@ function DashboardLayout() {
         </Link>
         <nav className="space-y-1">
           {isUltimate && <NavItem to="/dashboard/admin" icon={<Users className="h-4 w-4" />}>Admin Overview</NavItem>}
+          {(role === "ADMIN" || role === "EMPLOYEE") && <NavItem to="/dashboard/worker" icon={<Wrench className="h-4 w-4" />}>My Dashboard</NavItem>}
           <NavItem to="/dashboard/orders" icon={<ClipboardList className="h-4 w-4" />}>Orders</NavItem>
           {isAdminOrUp && <NavItem to="/dashboard/catalog" icon={<Settings className="h-4 w-4" />}>Catalog & Pricing</NavItem>}
           {isUltimate && <NavItem to="/dashboard/settings" icon={<CreditCard className="h-4 w-4" />}>Payment Settings</NavItem>}

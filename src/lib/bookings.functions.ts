@@ -10,7 +10,7 @@ export const listBookings = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("bookings")
       .select(
-        "id, customer_name, customer_phone, customer_email, street_address, zip, service_mode, brand_name_snapshot, model_name_snapshot, services_snapshot, grand_total, appointment_at, status, created_at, notes",
+        "id, customer_name, customer_phone, customer_email, street_address, zip, service_mode, brand_name_snapshot, model_name_snapshot, services_snapshot, grand_total, appointment_at, status, created_at, notes, pickup_lat, pickup_lng, pickup_address, ride_fee",
       )
       .order("appointment_at", { ascending: false });
     if (error) throw new Error(error.message);

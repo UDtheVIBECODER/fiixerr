@@ -28,7 +28,7 @@ function AccessPage() {
       const email = `${username.trim().toLowerCase()}@fiixerr.staff`;
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
       if (signInErr) throw signInErr;
-      navigate({ to: "/dashboard/orders" });
+      navigate({ to: "/dashboard" });
     } catch (err) {
       setError("Invalid username or password.");
     } finally {

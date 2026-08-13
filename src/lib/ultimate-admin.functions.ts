@@ -54,7 +54,7 @@ export const getStaffWithStats = createServerFn({ method: "GET" })
     const [staffRes, bookingsRes] = await Promise.all([
       supabaseAdmin
         .from("profiles")
-        .select("id, username, role, address, zip, is_on_break, break_until, created_at")
+        .select("id, username, role, address, zip, is_on_break, break_until, hourly_rate, created_at")
         .in("role", ["ADMIN", "EMPLOYEE"])
         .order("created_at"),
       supabaseAdmin
@@ -184,6 +184,50 @@ export const removeStaffMember = createServerFn({ method: "POST" })
     await assertUltimateAdmin(context.userId);
     if (data.userId === context.userId) throw new Error("Cannot remove yourself");
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/* ── Set worker hourly rate ──────────────────────────────────────── */
+
+export const setWorkerPayRate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      workerId: z.string().uuid(),
+      hourlyRate: z.number().min(0).max(10_000),
+    }).parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    await assertUltimateAdmin(context.userId);
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update({ hourly_rate: data.hourlyRate })
+      .eq("id", data.workerId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/* ── Set manual pay on a single timesheet entry ──────────────────── */
+
+export const setTimesheetPay = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      timesheetId: z.string().uuid(),
+      payOverride: z.number().min(0).nullable(),
+      payNote: z.string().max(200).nullable(),
+    }).parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    await assertUltimateAdmin(context.userId);
+    const { error } = await supabaseAdmin
+      .from("timesheets")
+      .update({
+        pay_override: data.payOverride,
+        pay_note: data.payNote || null,
+      })
+      .eq("id", data.timesheetId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

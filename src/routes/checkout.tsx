@@ -71,6 +71,10 @@ function CheckoutPage() {
           labor_total: draft.labor_total,
           travel_fee: draft.travel_fee,
           grand_total: draft.grand_total,
+          pickup_lat: draft.pickup_lat ?? null,
+          pickup_lng: draft.pickup_lng ?? null,
+          pickup_address: draft.pickup_address ?? null,
+          ride_fee: draft.ride_fee ?? 0,
           appointment_at: draft.appointment_at,
           status: "pending",
           pre_repair_checklist: {},
@@ -248,7 +252,7 @@ function CheckoutPage() {
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-foreground/75">
-                    {draft.service_mode === "mobile" ? `Travel (${draft.zip})` : "Travel"}
+                    {draft.service_mode === "mobile" ? "Ride fee" : "Travel"}
                   </dt>
                   <dd className="font-medium">{fmt(draft.travel_fee)}</dd>
                 </div>
